@@ -14,8 +14,10 @@ vim.api.nvim_create_user_command('CompileMode',
                 if not input then return end
                 local Compile = require('compile')
                 local cm = Compile:new()
-                cm:call_cmd(input)
-                vim.g.compile_mode_last_cmd = input
-                cm.win = vim.api.nvim_open_win(cm.buf, true, Compile.CM_WIN_OPTS) 
+                if cm ~= nil then
+                    cm:call_cmd(input)
+                    vim.g.compile_mode_last_cmd = input
+                    cm.win = vim.api.nvim_open_win(cm.buf, true, Compile.CM_WIN_OPTS) 
+                end
             end)
     end, {})

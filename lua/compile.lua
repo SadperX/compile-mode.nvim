@@ -7,8 +7,33 @@ local REG_FORMAT = '^.*:%d+:%d+:?'
 Compile.CM_WIN_OPTS = { split = 'below'}
 --TODO: Get errors list in a quickfix and get that list in the compilation buffer
 
+local function handle_previus_running_instance(cm)
+    vim.ui.input({ prompt = "CMD is running, kill it? [Y]es, [N]o : ", default = "Y" },
+        function(input)
+            if not input then return end
+            input = input:lower()
+            if input == 'y' then
+                cm:kill_cmd(9) --SIGKILL
+                vim.api.nvim_buf_delete(cm.buf, { force = true })
+                vim.cmd('CompileMode')
+            elseif input == 'n' then
+                print("Not killed")
+            else
+                print("Invalid input expected Y or N")
+            end
+        end)
+end
+
 function Compile:new()
     local cm = setmetatable({}, self)
+    if vim.g.compile_mode_ins ~= nil then
+        if vim.g.compile_mode_ins.cmd_running then
+            handle_previous_running_instance(vim.g.compile_mode_ins)
+            return nil
+        else
+            vim.api.nvim_buf_delete(vim.g.compile_mode_ins.buf, { force = true })
+        end
+    end
     -- 1 index :(
     cm.cur_error = 1
     cm.errors = {}
@@ -17,7 +42,6 @@ function Compile:new()
 
     -- WIN from cm was called
     cm.mw = vim.api.nvim_get_current_win()
-
     cm.ns = vim.api.nvim_create_namespace("CompileNS")
 
     -- [[ BUFFER ]]
@@ -27,6 +51,7 @@ function Compile:new()
     vim.api.nvim_set_option_value("buflisted", true, { buf = cm.buf })
     cm:set_keymaps()
     cm:set_autocmds()
+    vim.g.compile_mode_ins = cm
     return cm
 end
 
