@@ -6,6 +6,7 @@ vim.api.nvim_set_hl(0, 'CompilationBlue',   { fg = '#96a6c8', bg = nil} )
 vim.api.nvim_set_hl(0, 'Underline', { underline = true, fg = nil } )
 
 vim.api.nvim_create_augroup("CompileMode", { clear = true })
+vim.g.compile_mode_ins = nil
 
 vim.api.nvim_create_user_command('CompileMode', 
     function(opt)

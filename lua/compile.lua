@@ -7,7 +7,7 @@ local REG_FORMAT = '^.*:%d+:%d+:?'
 Compile.CM_WIN_OPTS = { split = 'below'}
 --TODO: Get errors list in a quickfix and get that list in the compilation buffer
 
-local function handle_previus_running_instance(cm)
+local function handle_previous_running_instance(cm)
     vim.ui.input({ prompt = "CMD is running, kill it? [Y]es, [N]o : ", default = "Y" },
         function(input)
             if not input then return end
@@ -200,7 +200,7 @@ function Compile:prev_error()
 end
 
 function Compile:handle_exit_code(code)
-    if not code then return end
+    if not code or not vim.api.nvim_buf_is_valid(self.buf) then return end
     local comp = "Compilation"
     local fin = " finished"
     local l = vim.api.nvim_buf_line_count(self.buf) + 1
